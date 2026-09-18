@@ -44,6 +44,7 @@ core:
 	install -dDm0755 $(DESTDIR)/$(DATA_DIR)/pipewire/pipewire.conf.d/
 	install -dDm0755 $(DESTDIR)/$(DATA_DIR)/pipewire/pipewire-pulse.conf.d/
 	install -pm0644 conf/wireplumber.conf $(DESTDIR)/$(DATA_DIR)/wireplumber/wireplumber.conf.d/99-asahi.conf
+	install -pm0644 conf/j700.conf $(DESTDIR)/$(DATA_DIR)/wireplumber/wireplumber.conf.d/99-asahi-j700.conf
 	install -pm0644 conf/asahi-lock-volume.lua $(DESTDIR)/$(DATA_DIR)/wireplumber/scripts/device/asahi-lock-volume.lua
 	install -pm0644 conf/pipewire.conf $(DESTDIR)/$(DATA_DIR)/pipewire/pipewire.conf.d/99-asahi.conf
 	install -pm0644 conf/pipewire.conf $(DESTDIR)/$(DATA_DIR)/pipewire/pipewire-pulse.conf.d/99-asahi.conf
@@ -54,11 +55,12 @@ j%: core
 	install -pm0644 -t $(DESTDIR)/$(DATA_DIR)/asahi-audio/$@/ $(wildcard firs/$@/*)
 
 
-install: aliases core j274 j293 j313 j314 j316 j413 j415 j375
+install: aliases core j274 j293 j313 j314 j316 j413 j415 j375 j700
 
 uninstall:
 	rm -rf $(DESTDIR)/$(DATA_DIR)/asahi-audio/
 	rm -rf $(DESTDIR)/$(DATA_DIR)/wireplumber/wireplumber.conf.d/99-asahi.conf
+	rm -f $(DESTDIR)/$(DATA_DIR)/wireplumber/wireplumber.conf.d/99-asahi-j700.conf
 	rm -rf $(DESTDIR)/$(DATA_DIR)/wireplumber/scripts/device/asahi-limit-volume.lua
 	rm -rf $(DESTDIR)/$(DATA_DIR)/pipewire/pipewire.conf.d/99-asahi.conf
 	rm -rf $(DESTDIR)/$(DATA_DIR)/pipewire/pipewire-pulse.conf.d/99-asahi.conf
