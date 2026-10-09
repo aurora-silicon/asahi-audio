@@ -25,14 +25,15 @@ in this native provider order:
 | --- | --- | --- | --- |
 | 0 | Left woofer 1 | i2c1:0x38 | Separate pulse and paired five-second playback |
 | 1 | Right woofer 1 | i2c3:0x3b | Separate pulse and paired five-second playback |
-| 2 | Left woofer 2 | i2c1:0x39 | Not tested acoustically |
-| 3 | Right woofer 2 | i2c3:0x3c | Not tested acoustically |
-| 4 | Left tweeter | i2c1:0x3a | Not tested acoustically |
-| 5 | Right tweeter | i2c3:0x3d | Not tested acoustically |
+| 2 | Left woofer 2 | i2c1:0x39 | Individual one-second 300 Hz tone |
+| 3 | Right woofer 2 | i2c3:0x3c | Individual one-second 300 Hz tone |
+| 4 | Left tweeter | i2c1:0x3a | Individual one-second 2 kHz tone |
+| 5 | Right tweeter | i2c3:0x3d | Individual one-second 2 kHz tone |
 
 The index is a native provider index, not an ALSA channel assignment.
 All six passed identity reads and native protected shutdown configuration;
-neither result qualifies protection efficacy or all-six acoustic output.
+all six now have user-confirmed individual tone output. These tests do not
+qualify protection efficacy or simultaneous all-six playback.
 
 ## Qualified proxy evidence
 
@@ -44,7 +45,7 @@ These are separate bounded proxy tests, not Linux streaming tests:
 | Low-power internal microphone, `lpai` | Producer reports use 12-byte frames; a reconstructed normalized preview contains recognizable speech, with snapshot-boundary integrity still unqualified |
 | Headset microphone, `cin ` | Mono 24-bit samples in 32-bit slots, nominal 48 kHz; completed capture with recognizable audio |
 | Headphones, `cout` | Stereo 24-bit samples in 32-bit slots, nominal 48 kHz; finite left/right tones heard, with codec/controller restoration passing |
-| Speakers, `spkr` | Six 24-bit playback samples in 32-bit slots, nominal 48 kHz; first left/right woofers heard separately and together for five seconds |
+| Speakers, `spkr` | Six 24-bit playback samples in 32-bit slots, nominal 48 kHz; all six drivers heard individually, first left/right woofers also paired for five seconds |
 
 The trailing space in `cin ` is part of the firmware identifier.
 Nominal rates are profile values, not measurements of clock accuracy.
@@ -66,6 +67,22 @@ prevented complete cleanup. Resources were retained until validated watchdog
 recovery. Audible paired playback does not qualify reliable repeated cleanup
 or continuous streaming. The observed codec-control midpoint is not a
 calibrated macOS or Linux volume-slider percentage.
+
+The second woofers and both tweeters each pass a one-second individual test
+with peak 0.125 and 20 ms fades. Full native protection is reapplied to the
+selected amp; the other five stay in freshly verified factory shutdown.
+Matching TX reports, zero residue/DART faults, mute before TX stop, protected
+shutdown, exact controller/GPIO restoration and watchdog recovery all pass.
+DVC is 0x65 for the second woofers and left tweeter, 0x78 for the right tweeter.
+These are finite test settings, not calibrated system-volume levels.
+
+The shared Python I2C helper now clears the observed status snapshot and
+rejects XIP before writing it. Direct guarded calls pass on both idle speaker
+buses; bounded private amp trials use the same clear policy with their
+stronger ownership, error and XEN/no-XIP gates. Later shutdown and individual
+cleanup successes do not establish that the intermittent STOP fault is cured.
+Existing generic transfer methods still reset FIFOs before this check, so
+this helper change alone does not make an entire transfer concurrency-safe.
 
 ## Linux test admission
 
@@ -96,9 +113,9 @@ and calibration; their geometry does not qualify J616s.
 ## Sources and implementation boundary
 
 Published proxy evidence:
-[bring-up](https://github.com/aurora-silicon/m1n1/blob/2480cc5f7def1b7124ffd5d25d56305f57462942/docs/j616s-bringup.md)
+[bring-up](https://github.com/aurora-silicon/m1n1/blob/fd360ef69054e42724b975d7a4c61e0242b6b341/docs/j616s-bringup.md)
 and
-[driver contracts](https://github.com/aurora-silicon/m1n1/blob/2480cc5f7def1b7124ffd5d25d56305f57462942/docs/j616s-driver-contracts.md),
+[driver contracts](https://github.com/aurora-silicon/m1n1/blob/fd360ef69054e42724b975d7a4c61e0242b6b341/docs/j616s-driver-contracts.md),
 retained in [m1n1 draft PR 20](https://github.com/aurora-silicon/m1n1/pull/20).
 The native display names and codec topology come from the local 2026-10-08
 macOS inventory and saved J616s ADT reviewed for this draft; the underlying
