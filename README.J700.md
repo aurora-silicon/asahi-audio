@@ -3,6 +3,19 @@
 This addition needs the matching J700 UCM entries from alsa-ucm-conf-asahi.
 It is built from upstream f5b118a8a2fb150b145cb667b4738cdab0304eb0.
 
+The J700 is set up like the other Asahi laptops. Users see these devices:
+
+| Device | Node | Available |
+|---|---|---|
+| "MacBook Neo J700 Speakers" | `audio_effect.j700-convolver` (DSP sink) | always |
+| "Built-in Audio Headphones" | UCM `Headphones` on `hw:AppleJ700,0` | while headphones are plugged in |
+| "MacBook Neo J700 Microphone" | `effect_output.j700-mic` (DSP source) | always; the default microphone |
+| "Built-in Audio Headset Microphone" | UCM `Headset` on `hw:AppleJ700,0` | while a headset is plugged in |
+
+The raw speaker and microphone-array nodes are hidden behind their DSP
+filters, the same way as on the other machines. The J700 rules are part of
+`conf/wireplumber.conf`; there is no separate J700 configuration file.
+
 ## Speakers
 
 `hw:AppleJ700,1` is the raw speaker device (one MAX98360A per channel on the
@@ -27,38 +40,55 @@ The kernel limits the raw device to -20 dBFS on the wire and holds its
 takes the volume lock; that control is not a PipeWire route volume and is
 never touched by this configuration.
 
-`conf/j700.conf` is strict JSON, which is a subset of WirePlumber's SPA-JSON
-configuration format. `make core` installs it as `99-asahi-j700.conf` next to
-the existing Asahi configuration. The file adds only exact J700/NeoMic matches.
+## Headphones and headset microphone
 
-The headphone **device route** initial volume is 10^(-50/20), or -50 dB relative
-to jack full scale. This is `device.routes.default-sink-volume`, not the stream
-property `state.default-volume`. Existing saved user volumes take precedence;
-the profile does not impose a headphone ceiling or erase user state.
-See https://pipewire.pages.freedesktop.org/wireplumber/daemon/configuration/settings.html
-and https://pipewire.pages.freedesktop.org/wireplumber/daemon/configuration/modifying_configuration.html .
+The 3.5 mm jack is a CS42L83 on `hw:AppleJ700,0`, described by the shared
+laptop UCM verb, so the nodes, names and priorities are the stock ones.
+The jack uses ALSA S24_LE (PipeWire S24_32LE) at 48 kHz: stereo output and
+mono headset input.  The jack-detect controls make both routes available
+only while something is plugged in.
 
-The jack hardware uses ALSA S24_LE (24 valid low bits in each 32-bit word),
-which is PipeWire S24_32LE, at 48 kHz: stereo output and mono headset input.
-The separate `AppleJ700LPAI` card (the low-power microphone) uses S32LE at 16 kHz with two channels. Its measured
-geometry and actual ALSA long name come from the J700 kernel and hb44 capture.
-No gain, beamforming or speaker DSP has been invented for the uncalibrated paths.
+The one J700-specific rule here is the initial headphone route volume:
+10^(-50/20), or -50 dB relative to jack full scale, set with
+`device.routes.default-sink-volume`.  A volume the user has already set
+takes precedence, and there is no ceiling.
 
-The UCM profile enables the headset ADC HPF and leaves boost off. A user who
-needs extra microphone gain can explicitly enable `Jack ADC Boost Switch`;
-UCM restores boost off when re-enabling the headset/HiFi route.
+## Microphones
 
-Target acceptance, when transport returns:
+The microphones are on a second, capture-only card, `AppleJ700AOP` (driver
+`t8140-aop-audio`, long name "MacBook Neo J700 AOP Audio"), not on macaudio.
 
-1. With an isolated test user's WirePlumber state, load the matching UCM and
-   this configuration from tmpfs; do not alter the read-only installed root.
-2. Inspect `alsaucm -c hw:AppleJ700 dump text` and `alsaucm -c hw:AppleJ700LPAI dump text`.
-3. Start PipeWire/WirePlumber with no application playback. Check `wpctl status`
-   and `pw-dump`: headphones, headset microphone and internal microphone only;
-   no speaker route. Confirm ALSA path, format, channels and rate on each node.
-4. Confirm headphone initial effective volume is -50 dB and the saved-volume
-   behavior works across a route switch. Inspect the HPF/boost mixer controls.
-5. Check jack unplug/replug routing and capture both microphones. Audible tests
-   remain separate, attended tests with the established low-level source files.
+**The microphone array** is PCM 1, `hpai`: two capsules, float32 (PipeWire
+F32LE) at 48 kHz only.  It is the card's only UCM device ("Mic").  Like the
+`AppleJxxxHPAI` cards of the other laptops, it is renamed
+`alsa_input.platform-sound.RawMics`, hidden, and wrapped by the
+`node.software-dsp` rule in `firs/j700/mic.json`.  The result is the
+"MacBook Neo J700 Microphone" source, at the same priority as the other
+machines' microphones.  The filter averages the two capsules, adds +24 dB of
+make-up gain in two stages and applies the usual 120 Hz high-pass.  There is
+no beamformer for a two-capsule array, and the gain is provisional until it
+is calibrated against the other machines.
 
-Do not claim this profile is deployed or hardware-validated until these pass.
+**The low-power microphone** is PCM 0, `lpai`.  It is not a user device:
+it is absent from the UCM verb, and a WirePlumber rule disables any node on
+PCM 0 of `AppleJ700AOP`, so no profile of the card (not even pro-audio) shows it.
+It exists for developers working on always-on, low-power features such as
+wake-word detection.
+
+* ALSA device `hw:AppleJ700AOP,0`, capture only: S32_LE, 16 kHz, two
+  channels, in fixed 200 ms periods (3200 frames, a buffer of two to four
+  periods), for example:
+
+      arecord -D hw:AppleJ700AOP,0 -f S32_LE -r 16000 -c 2 -d 5 lpmic.wav
+
+* For a PipeWire source, link `firs/j700/lpmic-developer.conf` (installed as
+  `/usr/share/asahi-audio/j700/lpmic-developer.conf`) into
+  `~/.config/pipewire/pipewire.conf.d/` and restart `pipewire` and
+  `wireplumber`; the file has the exact commands.  This adds "Aurora
+  Low-Power Microphone (developer)" (`alsa_input.j700-lpmic-developer`) at
+  priority 1, so it never becomes the default while the array exists.
+  Remove the link to turn it off again.
+
+A WirePlumber state that saved the `pro-audio` profile for the AOP card
+bypasses UCM and with it the microphone filter.  Select the card's default
+profile (HiFi) again to get the "MacBook Neo J700 Microphone" back.
