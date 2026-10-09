@@ -90,3 +90,8 @@ simply unacceptable for anything but the most casual of listening.
 
 We aim to deliver a mostly flat response across the audible range that will faithfully reproduce
 source material without adding an excessive amount of colour.
+
+### J616s development reference
+
+[J616s evidence and device names](README.J616s.md) records verified capture
+facts and native device names. J616s runtime configuration remains pending.
