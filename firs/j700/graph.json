@@ -146,9 +146,9 @@
         "device.api": "dsp",
         "node.virtual": "false",
         "priority.session": 850,
-        "state.default-volume": 0.001,
+        "state.default-volume": 0.027,
         "state.restore-props": false,
-        "asahi.restore-props.max-volume": 0.001,
+        "asahi.restore-props": true,
         "device.icon-name": "audio-speakers"
     },
     "playback.props": {
