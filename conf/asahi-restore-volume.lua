@@ -20,6 +20,9 @@
 -- that connected shortly before, which names one-shot tools (wpctl, pactl,
 -- scripts).  A change made through a long-running client, such as a desktop
 -- shell talking to pipewire-pulse, shows no new client.
+-- External changes that return to their starting values still log their
+-- count and peak volume. A burst with restore and external changes names
+-- both origins; only unchanged bursts entirely due to restore are silent.
 
 cutils = require ("common-utils")
 log = Log.open_topic ("s-node")
@@ -198,18 +201,22 @@ function flushBurst (id, label)
   if not b or not now then
     return
   end
-  if sameVolumes (b.vols, now.vols) and b.mute == now.mute then
+  if b.external_count == 0 and sameVolumes (b.vols, now.vols) and
+      b.mute == now.mute then
     return
   end
   local origin
-  if b.internal then
+  if b.external_count == 0 then
     origin = "this script's restore"
+  elseif b.internal_count > 0 then
+    origin = "restore and another client; " ..
+        recentClientsText (b.start - RECENT_CLIENT_US)
   else
     origin = "another client; " .. recentClientsText (b.start - RECENT_CLIENT_US)
   end
-  log:notice (string.format ("%s: volume %s -> %s, mute %s -> %s (%d change%s; %s)",
+  log:notice (string.format ("%s: volume %s -> %s, mute %s -> %s (%d change%s; %s; peak volume %s)",
       label, volumeText (b.vols), volumeText (now.vols), tostring (b.mute),
-      tostring (now.mute), b.count, b.count == 1 and "" or "s", origin))
+      tostring (now.mute), b.count, b.count == 1 and "" or "s", origin, volumeText (b.peak)))
 end
 
 -- clients that exist when the script starts did not just connect
@@ -330,13 +337,21 @@ SimpleEventHook {
       local b = bursts [id]
       if not b then
         b = { vols = prev.vols, mute = prev.mute, count = 0,
-              start = GLib.get_monotonic_time (), internal = false }
+              start = GLib.get_monotonic_time (), internal_count = 0,
+              external_count = 0, peak = { table.unpack (prev.vols) } }
         bursts [id] = b
       else
         b.source:destroy ()
       end
       b.count = b.count + 1
-      b.internal = b.internal or restoring [id] == true
+      if restoring [id] == true then
+        b.internal_count = b.internal_count + 1
+      else
+        b.external_count = b.external_count + 1
+      end
+      for i, v in ipairs (vols) do
+        b.peak [i] = math.max (b.peak [i] or v, v)
+      end
       b.source = Core.timeout_add (BURST_MS, function ()
         flushBurst (id, key)
       end)

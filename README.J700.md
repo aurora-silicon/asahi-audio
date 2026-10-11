@@ -57,7 +57,7 @@ The script logs every change of the sink's volume or mute state to the
 journal, one notice line per burst of changes (WirePlumber's default log
 level shows notices), for example:
 
-    audio_effect.j700-convolver: volume 0.10 -> 1.00, mute false -> false (1 change; another client; clients connected just before: wpctl (pid 4242))
+    audio_effect.j700-convolver: volume 0.10 -> 1.00, mute false -> false (1 change; another client; clients connected just before: wpctl (pid 4242); peak volume 1.00)
 
 Volumes are shown as desktop sliders show them.  PipeWire does not say
 which client set a parameter, so the line says whether the script's own
@@ -67,6 +67,11 @@ including PulseAudio clients such as `pactl`, which pipewire-pulse
 connects as clients of their own.  A change made through a client that was
 already connected, such as the desktop shell, shows no new client; the
 time of the line then has to be matched against that client's own logs.
+
+The change log keeps external bursts even when the volume and mute finish
+where they started, and reports the peak volume reached during each burst.
+A burst containing both a restore and an external change names both; only
+an unchanged burst entirely due to restore is omitted.
 
 ## Headphones and headset microphone
 
