@@ -40,12 +40,14 @@ clean:
 
 core:
 	install -dDm0755 $(DESTDIR)/$(DATA_DIR)/wireplumber/scripts/device/
+	install -dDm0755 $(DESTDIR)/$(DATA_DIR)/wireplumber/scripts/node/
 	install -dDm0755 $(DESTDIR)/$(DATA_DIR)/wireplumber/wireplumber.conf.d/
 	install -dDm0755 $(DESTDIR)/$(DATA_DIR)/pipewire/pipewire.conf.d/
 	install -dDm0755 $(DESTDIR)/$(DATA_DIR)/pipewire/pipewire-pulse.conf.d/
 	install -pm0644 conf/wireplumber.conf $(DESTDIR)/$(DATA_DIR)/wireplumber/wireplumber.conf.d/99-asahi.conf
 	install -pm0644 conf/asahi-lock-volume.lua $(DESTDIR)/$(DATA_DIR)/wireplumber/scripts/device/asahi-lock-volume.lua
 	install -pm0644 conf/asahi-unplugged-routes.lua $(DESTDIR)/$(DATA_DIR)/wireplumber/scripts/device/asahi-unplugged-routes.lua
+	install -pm0644 conf/asahi-restore-volume.lua $(DESTDIR)/$(DATA_DIR)/wireplumber/scripts/node/asahi-restore-volume.lua
 	install -pm0644 conf/pipewire.conf $(DESTDIR)/$(DATA_DIR)/pipewire/pipewire.conf.d/99-asahi.conf
 	install -pm0644 conf/pipewire.conf $(DESTDIR)/$(DATA_DIR)/pipewire/pipewire-pulse.conf.d/99-asahi.conf
 	install -dDm0755 $(DESTDIR)/$(DATA_DIR)/asahi-audio/
@@ -61,5 +63,6 @@ uninstall:
 	rm -rf $(DESTDIR)/$(DATA_DIR)/asahi-audio/
 	rm -rf $(DESTDIR)/$(DATA_DIR)/wireplumber/wireplumber.conf.d/99-asahi.conf
 	rm -rf $(DESTDIR)/$(DATA_DIR)/wireplumber/scripts/device/asahi-limit-volume.lua
+	rm -rf $(DESTDIR)/$(DATA_DIR)/wireplumber/scripts/node/asahi-restore-volume.lua
 	rm -rf $(DESTDIR)/$(DATA_DIR)/pipewire/pipewire.conf.d/99-asahi.conf
 	rm -rf $(DESTDIR)/$(DATA_DIR)/pipewire/pipewire-pulse.conf.d/99-asahi.conf
