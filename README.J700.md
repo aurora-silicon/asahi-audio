@@ -40,6 +40,21 @@ The kernel limits the raw device to -20 dBFS on the wire and holds its
 takes the volume lock; that control is not a PipeWire route volume and is
 never touched by this configuration.
 
+The speaker sink starts at no more than 10 % every time it is created,
+which happens at every boot and whenever WirePlumber restarts.  10 % is
+0.001, or -60 dB below the sink's full volume, on desktop volume sliders
+(cubic scale), the same as the headphones.  `asahi-restore-volume.lua`
+stores and restores the sink's volume and mute state in place of
+WirePlumber's stream state, which the graph turns off for this sink with
+`state.restore-props = false`.  The sink gets its stored volume, lowered
+to `asahi.restore-props.max-volume` (0.001) when above it, and its stored
+mute state; the first time, the ones WirePlumber had stored for it.
+Without a stored volume it gets `state.default-volume` (0.001).  A lower volume and mute carry over from one boot to the next.  A
+volume above 10 % lasts until the sink is next created, and there is no
+ceiling while the sink exists.  A stored volume is not proof that the user
+chose it: a volume stored by any client at any time would otherwise come
+back at the next boot, before anyone is listening.
+
 ## Headphones and headset microphone
 
 The 3.5 mm jack is a CS42L83 on `hw:AppleJ700,0`, described by the shared
