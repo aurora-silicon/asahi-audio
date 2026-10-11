@@ -1,6 +1,6 @@
 -- SPDX-License-Identifier: MIT
 --
--- Restore a node's volume and mute state as they were.
+-- Restore a node's volume and mute state, and log every change to them.
 --
 -- For nodes that set asahi.restore-props = true, this script stores and
 -- restores the channel volumes and mute state in place of WirePlumber's
@@ -11,15 +11,35 @@
 -- stream state had stored for the node.  A stored volume that is missing,
 -- has the wrong number of channels or holds a value that is not a number
 -- from 0 to 1 is ignored, and the node gets state.default-volume instead.
+--
+-- Every change to the volume or mute state of such a node is logged as one
+-- notice line per burst of changes (changes less than half a second apart):
+-- the values before and after, and where the change came from.  PipeWire
+-- does not say which client set a parameter.  The line says whether this
+-- script's restore made the change; otherwise it lists the PipeWire clients
+-- that connected shortly before, which names one-shot tools (wpctl, pactl,
+-- scripts).  A change made through a long-running client, such as a desktop
+-- shell talking to pipewire-pulse, shows no new client.
 
 cutils = require ("common-utils")
 log = Log.open_topic ("s-node")
 
 ENABLE_PROP = "asahi.restore-props"
 FALLBACK_DEFAULT = 0.027   -- 30 % on a cubic volume slider
+BURST_MS = 500             -- changes closer than this are one log line
+RECENT_CLIENT_US = 3000000 -- clients that connected this long before a change
 
 state = State ("asahi-restore-volume")
 state_table = state:load ()
+
+-- per node id: { volumes, mute } last seen, the pending log line, and
+-- whether this script's own restore is in flight
+last_seen = {}
+bursts = {}
+restoring = {}
+
+-- recently connected PipeWire clients: { time, name, pid }
+recent_clients = {}
 
 function restoreEnabled ()
   return Settings.get_boolean ("node.stream.restore-props")
@@ -152,6 +172,73 @@ function valuesText (values)
   return "[" .. table.concat (parts, ", ") .. "]"
 end
 
+MAX_CLIENTS_LISTED = 6
+
+function recentClientsText (since)
+  local names = {}
+  for _, c in ipairs (recent_clients) do
+    if c.time >= since then
+      table.insert (names, string.format ("%s (pid %s)", c.name, c.pid))
+    end
+  end
+  if #names == 0 then
+    return "no client connected just before"
+  end
+  -- the most recent ones
+  while #names > MAX_CLIENTS_LISTED do
+    table.remove (names, 1)
+  end
+  return "clients connected just before: " .. table.concat (names, ", ")
+end
+
+function flushBurst (id, label)
+  local b = bursts [id]
+  bursts [id] = nil
+  local now = last_seen [id]
+  if not b or not now then
+    return
+  end
+  if sameVolumes (b.vols, now.vols) and b.mute == now.mute then
+    return
+  end
+  local origin
+  if b.internal then
+    origin = "this script's restore"
+  else
+    origin = "another client; " .. recentClientsText (b.start - RECENT_CLIENT_US)
+  end
+  log:notice (string.format ("%s: volume %s -> %s, mute %s -> %s (%d change%s; %s)",
+      label, volumeText (b.vols), volumeText (now.vols), tostring (b.mute),
+      tostring (now.mute), b.count, b.count == 1 and "" or "s", origin))
+end
+
+-- clients that exist when the script starts did not just connect
+clients_ready = false
+clients_om = ObjectManager {
+  Interest { type = "client" },
+}
+clients_om:connect ("installed", function ()
+  clients_ready = true
+end)
+clients_om:connect ("object-added", function (_, client)
+  local props = client.properties
+  if not clients_ready or props ["wireplumber.daemon"] == "true" then
+    return
+  end
+  local now = GLib.get_monotonic_time ()
+  table.insert (recent_clients, {
+    time = now,
+    name = props ["application.name"] or props ["application.process.binary"] or "?",
+    pid = props ["application.process.id"] or props ["pipewire.sec.pid"] or "?",
+  })
+  -- keep only what a burst can still refer to
+  while #recent_clients > 0 and
+      recent_clients [1].time < now - 2 * RECENT_CLIENT_US do
+    table.remove (recent_clients, 1)
+  end
+end)
+clients_om:activate ()
+
 SimpleEventHook {
   name = "node/asahi-restore-volume",
   after = "node/restore-stream",
@@ -209,6 +296,11 @@ SimpleEventHook {
 
     log:info (node, string.format ("restoring %s: volume %s, mute %s (%s)",
         tostring (key), volumeText (vols), tostring (mute), source))
+    -- what the node is about to report; a report of anything else before
+    -- the restore lands is part of the restore's burst, which logs nothing
+    -- when it ends where it started
+    last_seen [node.id] = { vols = vols, mute = type (mute) == "boolean" and mute or false }
+    restoring [node.id] = true
     node:set_param ("Props", Pod.Object (props))
   end
 }:register ()
@@ -230,6 +322,28 @@ SimpleEventHook {
       return
     end
 
+    -- log: one line per burst of changes
+    local id = node.id
+    local prev = last_seen [id]
+    last_seen [id] = { vols = vols, mute = mute }
+    if prev and not (sameVolumes (prev.vols, vols) and prev.mute == mute) then
+      local b = bursts [id]
+      if not b then
+        b = { vols = prev.vols, mute = prev.mute, count = 0,
+              start = GLib.get_monotonic_time (), internal = false }
+        bursts [id] = b
+      else
+        b.source:destroy ()
+      end
+      b.count = b.count + 1
+      b.internal = b.internal or restoring [id] == true
+      b.source = Core.timeout_add (BURST_MS, function ()
+        flushBurst (id, key)
+      end)
+    end
+    restoring [id] = nil
+
+    -- store
     if not restoreEnabled () then
       return
     end
@@ -247,3 +361,22 @@ SimpleEventHook {
   end
 }:register ()
 
+SimpleEventHook {
+  name = "node/asahi-forget-volume-log",
+  interests = {
+    EventInterest {
+      Constraint { "event.type", "=", "node-removed" },
+      Constraint { ENABLE_PROP, "=", "true" },
+    },
+  },
+  execute = function (event)
+    local node = event:get_subject ()
+    local b = bursts [node.id]
+    if b then
+      b.source:destroy ()
+      flushBurst (node.id, nodeKey (node))
+    end
+    last_seen [node.id] = nil
+    restoring [node.id] = nil
+  end
+}:register ()

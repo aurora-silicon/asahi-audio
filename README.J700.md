@@ -53,6 +53,21 @@ stored volume that is not a number from 0 to 1 for each channel, it gets
 `state.default-volume`, 0.027: 30 % on desktop volume sliders (cubic
 scale), audible for a first notification without starting loud.
 
+The script logs every change of the sink's volume or mute state to the
+journal, one notice line per burst of changes (WirePlumber's default log
+level shows notices), for example:
+
+    audio_effect.j700-convolver: volume 0.10 -> 1.00, mute false -> false (1 change; another client; clients connected just before: wpctl (pid 4242))
+
+Volumes are shown as desktop sliders show them.  PipeWire does not say
+which client set a parameter, so the line says whether the script's own
+restore made the change and otherwise lists the PipeWire clients that
+connected in the three seconds before it.  That names one-shot tools,
+including PulseAudio clients such as `pactl`, which pipewire-pulse
+connects as clients of their own.  A change made through a client that was
+already connected, such as the desktop shell, shows no new client; the
+time of the line then has to be matched against that client's own logs.
+
 ## Headphones and headset microphone
 
 The 3.5 mm jack is a CS42L83 on `hw:AppleJ700,0`, described by the shared
