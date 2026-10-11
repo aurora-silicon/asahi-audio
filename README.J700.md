@@ -48,10 +48,18 @@ The jack uses ALSA S24_LE (PipeWire S24_32LE) at 48 kHz: stereo output and
 mono headset input.  The jack-detect controls make both routes available
 only while something is plugged in.
 
-The one J700-specific rule here is the initial headphone route volume:
-10^(-50/20), or -50 dB relative to jack full scale, set with
-`device.routes.default-sink-volume`.  A volume the user has already set
-takes precedence, and there is no ceiling.
+The J700-specific part is the initial headphone volume: 0.001, or -60 dB
+relative to jack full scale, which desktop volume sliders (cubic scale)
+show as 10 %.  It is set with `device.routes.default-sink-volume` on the
+card device.  A volume the user has already set takes precedence, and
+there is no ceiling.
+
+WirePlumber only selects routes that are available, so with nothing in
+the jack the headphone node would get no route and report 100 % until
+something is plugged in.  `asahi-unplugged-routes.lua`, enabled for this
+card with `asahi.routes.select-unplugged`, selects the unplugged
+headphone route anyway, so the node always shows the volume the
+headphones will get: the stored one, or the default above.
 
 ## Microphones
 
