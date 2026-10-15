@@ -35,10 +35,28 @@ should be replaced by a measurement in front of the laptop; the
 bankstown/compressor settings are provisional for the same reason.  The
 graph only lists 48 kHz because the hardware path is fixed at that rate.
 
-The kernel limits the raw device to -20 dBFS on the wire and holds its
-"Speaker Playback Volume" 20 dB lower until a speaker-protection daemon
-takes the volume lock; that control is not a PipeWire route volume and is
-never touched by this configuration.
+The raw device reaches the amplifier's full scale (0 dBFS on the wire,
+7.3 V peak) only while a speaker-protection daemon (speakerguardd) holds
+the card's volume lock and governs "Speaker Playback Volume" with its
+thermal model; without the daemon the kernel holds that control 20 dB
+down.  The control is not a PipeWire route volume and is never touched by
+this configuration.
+
+At 100 % the graph alone takes, measured on the machine (a -20 dBFS tone
+recorded at the graph's output, 2026-10-15): -1.5 dB at 1 kHz, -6.6 dB at
+2.5 kHz and -4.4 dB at 5 kHz, mostly the correction's cut of the
+presence peaks.  The convolvers therefore carry +3 dB of make-up gain
+(`"gain": 1.41`), as on j413.  The compressor that ends the shared graph
+shape (`woofer_lim`, 0 dBFS, 15:1, RMS detection) lets transients through:
+with the make-up gain, a mastered-music-like test signal (-1 dBFS peak,
+12 dB crest factor) left the graph at up to +3.5 dBFS, and the S32
+conversion clipped 0.06 % of its samples (18 clip events a second).  A
+brick-wall limiter (LSP limiter, -0.5 dBFS, 5 ms lookahead) after it
+removes those overs (0 clipped samples) without costing level.  Measured
+with the internal microphone, the result is 2.75 dB louder at 100 % than
+without the make-up gain, with the same frequency response; speakerguardd
+took no reduction during 60 s of the test signal at 100 % (0.84 W mean
+per speaker).
 
 The speaker sink comes back at the volume and mute state it last had,
 every time it is created (at every boot and whenever WirePlumber
