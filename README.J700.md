@@ -46,9 +46,17 @@ At 100 % the graph alone takes, measured on the machine (a -20 dBFS tone
 recorded at the graph's output, 2026-10-15): -1.5 dB at 1 kHz, -6.6 dB at
 2.5 kHz and -4.4 dB at 5 kHz, mostly the correction's cut of the
 presence peaks.  The convolvers therefore carry +3 dB of make-up gain
-(`"gain": 1.41`), as on j413, and the final limiter (0 dBFS, 15:1) holds
-the result at full scale; the speaker-protection daemon, which measures
-the wire through the Speaker Sense tap, governs the power that results.
+(`"gain": 1.41`), as on j413.  The compressor that ends the shared graph
+shape (`woofer_lim`, 0 dBFS, 15:1, RMS detection) lets transients through:
+with the make-up gain, a mastered-music-like test signal (-1 dBFS peak,
+12 dB crest factor) left the graph at up to +3.5 dBFS, and the S32
+conversion clipped 0.06 % of its samples (18 clip events a second).  A
+brick-wall limiter (LSP limiter, -0.5 dBFS, 5 ms lookahead) after it
+removes those overs (0 clipped samples) without costing level.  Measured
+with the internal microphone, the result is 2.75 dB louder at 100 % than
+without the make-up gain, with the same frequency response; speakerguardd
+took no reduction during 60 s of the test signal at 100 % (0.84 W mean
+per speaker).
 
 The speaker sink comes back at the volume and mute state it last had,
 every time it is created (at every boot and whenever WirePlumber

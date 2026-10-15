@@ -92,6 +92,19 @@
             },
             {
                 "type": "lv2",
+                "plugin": "http://lsp-plug.in/plugins/lv2/limiter_stereo",
+                "name": "final_lim",
+                "control": {
+                    "th": 0.944,
+                    "lk": 5.0,
+                    "at": 1.0,
+                    "rt": 20.0,
+                    "alr": 0,
+                    "boost": 0
+                }
+            },
+            {
+                "type": "lv2",
                 "plugin": "http://lsp-plug.in/plugins/lv2/compressor_stereo",
                 "name": "woofer_lim",
                 "control": {
@@ -113,14 +126,16 @@
             {"output": "convR:Out", "input": "woofer_bp:in_r"},
             {"output": "woofer_bp:out_l", "input": "woofer_lim:in_l"},
             {"output": "woofer_bp:out_r", "input": "woofer_lim:in_r"},
+            {"output": "woofer_lim:out_l", "input": "final_lim:in_l"},
+            {"output": "woofer_lim:out_r", "input": "final_lim:in_r"},
         ],
         "inputs": [
             "bassex:in_l",
             "bassex:in_r"
         ],
         "outputs": [
-            "woofer_lim:out_l",
-            "woofer_lim:out_r",
+            "final_lim:out_l",
+            "final_lim:out_r",
         ],
         "capture.volumes": [
             {
