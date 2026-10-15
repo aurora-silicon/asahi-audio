@@ -47,7 +47,7 @@
                         "/usr/share/asahi-audio/j700/48.wav"
                     ],
                     "channel": 0,
-                    "gain": 1.0
+                    "gain": 1.41
                 }
             },
             {
@@ -59,7 +59,7 @@
                         "/usr/share/asahi-audio/j700/48.wav"
                     ],
                     "channel": 0,
-                    "gain": 1.0
+                    "gain": 1.41
                 }
             },
             {
