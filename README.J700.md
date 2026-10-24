@@ -91,6 +91,38 @@ where they started, and reports the peak volume reached during each burst.
 A burst containing both a restore and an external change names both; only
 an unchanged burst entirely due to restore is omitted.
 
+### Excursion limiter (testing)
+
+`firs/j700/graph-xlim.json` is the speaker graph with one more node at the
+very end: `speakerguard-xlim`, a look-ahead limiter from speakerguardd
+(its `filter/`, a LADSPA plugin).  It predicts the cone's displacement for
+every sample from the driver's model (Bl 0.74 T m, Mms 0.16 g, Kms
+1720 N/m, Rms 0.14 kg/s, Re 4.3 ohm, resonance at 522 Hz) at the
+amplifier's full scale (7.30 and 7.33 V).  It lowers the gain just enough,
+ahead of time, that the cone stays under 0.9 of the driver's 0.565 mm
+displacement limit, and that no sample passes full scale.  Thermal and
+power limits stay with speakerguardd, which still holds the card's volume
+lock.  The limiter only ever lowers the gain, both channels together.
+Below its limits the output is the input delayed, bit for bit.
+Displacement binds only near full scale at low frequencies (at resonance
+from about -9 dBFS on the wire).
+
+It adds 351 frames (7.3 ms) of latency, inside a 352-frame budget, and
+reports them to PipeWire.  Offline, against an independent model of the
+cone, the worst of 87000 random programs and 172 worst-case shapes was
+0.8956 of the limit.
+
+It is not on by default.  `firs/j700/xlim-wireplumber.conf` selects it
+when copied to `~/.config/wireplumber/wireplumber.conf.d/` and followed
+by a restart of the user's WirePlumber and PipeWire.  Removing the copy
+and restarting the same way goes back.  It needs `speakerguard-xlim.so`
+on the LADSPA path.  Without it the speaker graph does not load, so there
+is no speaker audio, never unprotected audio.
+`tests/j700-xlim-graph.py` checks that the variant is the stock graph
+with only the limiter added, and that the limiter's controls are the
+J700's.  With `XLIM_SO` set to the built plugin it also checks every
+control and port name against the plugin.
+
 ## Headphones and headset microphone
 
 The 3.5 mm jack is a CS42L83 on `hw:AppleJ700,0`, described by the shared
