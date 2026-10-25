@@ -1,7 +1,34 @@
 # J616s audio evidence and device names
 
 This is a development reference for Mac16,7 / J616sAP, chip 0x6040,
-board 6. No J616s Linux boot, audio card, PCM or mixer ABI has been qualified.
+board 6.
+
+## Linux microphone
+
+The `aop_audio` driver registers `AppleJ616HPAI`, with the long name
+"MacBook Pro J616 High-Power Audio Interface". Its only capture PCM is
+`hw:AppleJ616HPAI,0`, a three-channel Float32LE array at 48 kHz.
+Use the matching J616 HPAI entry from alsa-ucm-conf-asahi.
+
+The shared raw microphone rule and the J616 DSP rule hide the raw HiFi
+source and expose `effect_output.j616-mic` as "MacBook Pro J616 Microphone".
+It uses the Neo microphone graph with three equally weighted inputs,
+the same gain of 16 and a 120 Hz high-pass filter. No beamforming geometry
+is assumed. Its session priority is 2005, as on the Neo; saved user choices
+and the plugged-in headset microphone retain their usual precedence.
+
+LPAI is configured internally by the AOP driver. It has no ALSA PCM on this
+card, so neither HiFi nor pro-audio can expose an LP microphone. The Neo's
+LP suppression rule remains specific to its separate AOP card.
+
+The graph and UCM need native capture, level and desktop visibility checks
+before this microphone is considered hardware-qualified. These checks
+require capture only. Do not play audio through the internal speakers.
+
+## Earlier bring-up reference
+
+The observations below predate the Linux microphone configuration and do
+not qualify its processing or the current kernel ABI.
 
 ## Observed devices and routes
 
@@ -121,10 +148,8 @@ The native display names and codec topology come from the local 2026-10-08
 macOS inventory and saved J616s ADT reviewed for this draft; the underlying
 native capture is not included here.
 
-This reference stages the evidence and acceptance checklist for DSP work.
-It adds no supported-device entry, WirePlumber match, filter graph, gain, EQ,
-impulse response or protection setting. A J616s microphone graph must first
-preserve the proven three-channel float input, then use measured processing.
+The earlier proxy evidence stages an acceptance checklist for DSP work.
+It does not qualify the microphone graph's gain or frequency response.
 Speaker EQ, crossover and Bankstown settings require measured response,
 headroom and distortion with qualified speaker protection; an audible
 300 Hz tone does not supply those measurements.

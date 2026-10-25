@@ -93,5 +93,6 @@ source material without adding an excessive amount of colour.
 
 ### J616s development reference
 
-[J616s evidence and device names](README.J616s.md) records verified capture
-facts and native device names. J616s runtime configuration remains pending.
+[J616s microphones and development reference](README.J616s.md) describes
+the HPAI microphone configuration and the earlier bring-up evidence.
+The microphone configuration still needs native hardware qualification.
