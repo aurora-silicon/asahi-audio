@@ -17,7 +17,7 @@
                 "label": "mixer",
                 "name": "boostInter",
                 "control": {
-                    "Gain 1": 4.0
+                    "Gain 1": 8.0
                 }
             },
             {
@@ -25,7 +25,7 @@
                 "label": "mixer",
                 "name": "boostFinal",
                 "control": {
-                    "Gain 1": 4.0
+                    "Gain 1": 8.0
                 }
             },
             {
