@@ -40,6 +40,66 @@
             },
             {
                 "type": "builtin",
+                "label": "bq_peaking",
+                "name": "eqL1",
+                "control": { "Freq": 160.0, "Q": 1.0, "Gain": -3.0 }
+            },
+            {
+                "type": "builtin",
+                "label": "bq_peaking",
+                "name": "eqL2",
+                "control": { "Freq": 630.0, "Q": 2.0, "Gain": -3.0 }
+            },
+            {
+                "type": "builtin",
+                "label": "bq_peaking",
+                "name": "eqL3",
+                "control": { "Freq": 3500.0, "Q": 0.9, "Gain": 3.0 }
+            },
+            {
+                "type": "builtin",
+                "label": "bq_peaking",
+                "name": "eqL4",
+                "control": { "Freq": 11500.0, "Q": 1.5, "Gain": -2.0 }
+            },
+            {
+                "type": "builtin",
+                "label": "bq_lowshelf",
+                "name": "eqL5",
+                "control": { "Freq": 90.0, "Q": 0.7, "Gain": 0.0 }
+            },
+            {
+                "type": "builtin",
+                "label": "bq_peaking",
+                "name": "eqR1",
+                "control": { "Freq": 160.0, "Q": 1.0, "Gain": -3.0 }
+            },
+            {
+                "type": "builtin",
+                "label": "bq_peaking",
+                "name": "eqR2",
+                "control": { "Freq": 630.0, "Q": 2.0, "Gain": -3.0 }
+            },
+            {
+                "type": "builtin",
+                "label": "bq_peaking",
+                "name": "eqR3",
+                "control": { "Freq": 3500.0, "Q": 0.9, "Gain": 3.0 }
+            },
+            {
+                "type": "builtin",
+                "label": "bq_peaking",
+                "name": "eqR4",
+                "control": { "Freq": 11500.0, "Q": 1.5, "Gain": -2.0 }
+            },
+            {
+                "type": "builtin",
+                "label": "bq_lowshelf",
+                "name": "eqR5",
+                "control": { "Freq": 90.0, "Q": 0.7, "Gain": 0.0 }
+            },
+            {
+                "type": "builtin",
                 "label": "convolver",
                 "name": "convLT",
                 "config": {
@@ -161,12 +221,22 @@
             }
         ],
         "links": [
+            {"output": "ell:out", "input": "eqL1:In"},
+            {"output": "eqL1:Out", "input": "eqL2:In"},
+            {"output": "eqL2:Out", "input": "eqL3:In"},
+            {"output": "eqL3:Out", "input": "eqL4:In"},
+            {"output": "eqL4:Out", "input": "eqL5:In"},
+            {"output": "elr:out", "input": "eqR1:In"},
+            {"output": "eqR1:Out", "input": "eqR2:In"},
+            {"output": "eqR2:Out", "input": "eqR3:In"},
+            {"output": "eqR3:Out", "input": "eqR4:In"},
+            {"output": "eqR4:Out", "input": "eqR5:In"},
             {"output": "bassex:out_l", "input": "ell:in"},
             {"output": "bassex:out_r", "input": "elr:in"},
-            {"output": "ell:out", "input": "convLT:In"},
-            {"output": "elr:out", "input": "convRT:In"},
-            {"output": "ell:out", "input": "convLW:In"},
-            {"output": "elr:out", "input": "convRW:In"},
+            {"output": "eqL5:Out", "input": "convLT:In"},
+            {"output": "eqR5:Out", "input": "convRT:In"},
+            {"output": "eqL5:Out", "input": "convLW:In"},
+            {"output": "eqR5:Out", "input": "convRW:In"},
             {"output": "convLW:Out", "input": "woofer_bp:in_l"},
             {"output": "convRW:Out", "input": "woofer_bp:in_r"},
             {"output": "woofer_bp:out_l", "input": "woofer_lim:in_l"},
@@ -191,13 +261,13 @@
         "capture.volumes": [
             {
                 "control": "ell:volume",
-                "min": -65.0,
+                "min": -50.0,
                 "max": 0.0,
                 "scale": "cubic"
             },
             {
                 "control": "elr:volume",
-                "min": -65.0,
+                "min": -50.0,
                 "max": 0.0,
                 "scale": "cubic"
             }
