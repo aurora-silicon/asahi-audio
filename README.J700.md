@@ -107,10 +107,15 @@ there is no ceiling.
 
 WirePlumber only selects routes that are available, so with nothing in
 the jack the headphone node would get no route and report 100 % until
-something is plugged in.  `asahi-unplugged-routes.lua`, enabled for this
-card with `asahi.routes.select-unplugged`, selects the unplugged
-headphone route anyway, so the node always shows the volume the
-headphones will get: the stored one, or the default above.
+something is plugged in.  `asahi-unplugged-routes.lua`, enabled for the
+built-in card of every Mac with `asahi.routes.select-unplugged`, selects
+the unplugged headphone route anyway, so the node always shows the volume
+the headphones will get: the stored one, or the default above.
+WirePlumber does not store what is set on an unavailable route, so the
+script also keeps the volume and mute set while nothing is plugged in
+(`~/.local/state/wireplumber/asahi-unplugged-routes`) and applies them
+whenever the route is selected, until they are changed again with
+headphones in.
 
 ## Microphones
 
