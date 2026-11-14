@@ -59,10 +59,13 @@ core:
 	install -pm0644 conf/asahi-unplugged-routes.lua $(DESTDIR)/$(DATA_DIR)/wireplumber/scripts/device/asahi-unplugged-routes.lua
 	install -pm0644 conf/asahi-hide-devices.lua $(DESTDIR)/$(DATA_DIR)/wireplumber/scripts/device/asahi-hide-devices.lua
 	install -pm0644 conf/asahi-keep-profile.lua $(DESTDIR)/$(DATA_DIR)/wireplumber/scripts/device/asahi-keep-profile.lua
+	install -pm0644 conf/asahi-jack-switch.lua $(DESTDIR)/$(DATA_DIR)/wireplumber/scripts/device/asahi-jack-switch.lua
 	install -pm0644 conf/asahi-restore-volume.lua $(DESTDIR)/$(DATA_DIR)/wireplumber/scripts/node/asahi-restore-volume.lua
 	install -pm0644 conf/pipewire.conf $(DESTDIR)/$(DATA_DIR)/pipewire/pipewire.conf.d/99-asahi.conf
 	install -pm0644 conf/pipewire.conf $(DESTDIR)/$(DATA_DIR)/pipewire/pipewire-pulse.conf.d/99-asahi.conf
 	install -dDm0755 $(DESTDIR)/$(DATA_DIR)/asahi-audio/
+	install -dDm0755 $(DESTDIR)/$(PREFIX)/lib/asahi-audio/
+	install -pm0755 tools/mic-from-tuning.py $(DESTDIR)/$(PREFIX)/lib/asahi-audio/mic-from-tuning
 
 j%: core
 	install -dDm0755 $(DESTDIR)/$(DATA_DIR)/asahi-audio/$@/
