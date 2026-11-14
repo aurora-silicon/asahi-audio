@@ -63,6 +63,8 @@ core:
 	install -pm0644 conf/pipewire.conf $(DESTDIR)/$(DATA_DIR)/pipewire/pipewire.conf.d/99-asahi.conf
 	install -pm0644 conf/pipewire.conf $(DESTDIR)/$(DATA_DIR)/pipewire/pipewire-pulse.conf.d/99-asahi.conf
 	install -dDm0755 $(DESTDIR)/$(DATA_DIR)/asahi-audio/
+	install -dDm0755 $(DESTDIR)/$(PREFIX)/lib/asahi-audio/
+	install -pm0755 tools/mic-from-tuning.py $(DESTDIR)/$(PREFIX)/lib/asahi-audio/mic-from-tuning
 
 j%: core
 	install -dDm0755 $(DESTDIR)/$(DATA_DIR)/asahi-audio/$@/
