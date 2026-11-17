@@ -251,9 +251,13 @@
         "node.name": "effect_output.j314-convolver",
         "node.description": "MacBook Pro J314 Speakers DSP Out",
         "media.name": "MacBook Pro J314 Speakers DSP Out",
+        "media.class": "Stream/Output/Audio/Internal",
         "target.object": "alsa_output.platform-sound.RawSpeakers",
         "node.dont-fallback": "true",
         "node.passive": "true",
+        "node.linger": "true",
+        "state.restore-props": "false",
+        "state.restore-target": "false",
         "audio.channels": "6",
         "audio.allowed-rates": [96000, 88200, 48000, 44100],
         "audio.position": ["AUX0", "AUX1", "AUX2", "AUX3", "AUX4", "AUX5"]

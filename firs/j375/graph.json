@@ -141,9 +141,13 @@
         "node.name": "effect_output.j375-convolver",
         "node.description": "Mac Studio Speaker DSP Out",
         "media.name": "Mac Studio Speaker DSP Out",
+        "media.class": "Stream/Output/Audio/Internal",
         "target.object": "alsa_output.platform-sound.RawSpeakers",
         "node.dont-fallback": "true",
         "node.passive": "true",
+        "node.linger": "true",
+        "state.restore-props": "false",
+        "state.restore-target": "false",
         "audio.channels": "2",
         "audio.allowed-rates": [96000, 88200, 48000, 44100],
         "audio.position": ["AUX0", "AUX1"]
