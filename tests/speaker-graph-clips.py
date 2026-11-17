@@ -12,7 +12,7 @@ limiter.
 Two parts:
 
 1. Static, runs anywhere: every graph output is fed by an LSP limiter
-   (limiter_stereo) at -0.5 dBFS or lower with lookahead and no level
+   (limiter_mono or limiter_stereo) at -0.5 dBFS or lower with lookahead and no level
    regulation or boost, and every output limiter of a graph has the same
    settings, so every output path keeps the same latency relative to the
    others (woofers and tweeters stay aligned).
@@ -49,7 +49,10 @@ import time
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FIRS = os.path.join(ROOT, "firs")
 RATE = 48000
-LIMITER = "http://lsp-plug.in/plugins/lv2/limiter_stereo"
+LIMITERS = {
+    "http://lsp-plug.in/plugins/lv2/limiter_mono",
+    "http://lsp-plug.in/plugins/lv2/limiter_stereo",
+}
 MAX_TH = 0.9441          # -0.5 dBFS
 failures = []
 
@@ -87,7 +90,7 @@ def static_check(board):
         while nodes[name].get("label") == "copy":
             name = feeds[name + ":In"].split(":")[0]
         n = nodes[name]
-        if n.get("plugin") != LIMITER:
+        if n.get("plugin") not in LIMITERS:
             check(False, "%s: output %s is fed by %s, not a brick-wall limiter" % (board, out, name))
             continue
         c = n.get("control", {})
@@ -281,12 +284,13 @@ class Offline:
         return sorted((p for p in self.run("pw-link", flag).split("\n") if p.startswith(node + ":")), key=key)
 
     def render(self, src, dst):
+        # the recorder and its DSP port configuration take the same positions
+        pos = ["MONO"] if self.n_out == 1 else ["AUX%d" % i for i in range(self.n_out)]
         rec = self.spawn(["pw-record", "-P", "{ node.autoconnect = false node.name = off.rec }",
                           "--rate", str(RATE), "--channels", str(self.n_out),
-                          "--channel-map", ",".join("AUX%d" % i for i in range(self.n_out)),
-                          "--format", "f32", dst])
+                          "--channel-map", ",".join(pos), "--format", "f32", dst])
         self.wait(lambda: self.node("off.rec"), "recorder")
-        self.portcfg("off.rec", "Input", ["AUX%d" % i for i in range(self.n_out)])
+        self.portcfg("off.rec", "Input", pos)
         play = self.spawn(["pw-play", "-P", "{ node.autoconnect = false node.name = off.play }", src])
         self.wait(lambda: self.node("off.play"), "player")
         self.portcfg("off.play", "Output", ["FL", "FR"])
