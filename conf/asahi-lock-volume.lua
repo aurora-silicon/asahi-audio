@@ -28,21 +28,23 @@ function handleDevice(device)
     end
 
     local pr = route.props.properties
-    if pr.channelVolumes[1] ~= 1.0 or pr.mute == true then
-      local props = {
+    if pr.mute ~= true then
+      goto skip_route
+    end
+
+    local volumes = pr.channelVolumes or Pod.Array({ "Spa:Float", 1.0 })
+    local param = Pod.Object {
+      "Spa:Pod:Object:Param:Route", "Route",
+      index = route.index,
+      device = route.device,
+      props = Pod.Object {
         "Spa:Pod:Object:Param:Props", "Route",
         mute = false,
-        channelVolumes = Pod.Array({ "Spa:Float", 1.0 })
-      }
-      local param = Pod.Object {
-        "Spa:Pod:Object:Param:Route", "Route",
-        index = route.index,
-        device = route.device,
-        props = Pod.Object(props),
-      }
-      Log.debug(param, "Forcing Speaker route props: " .. tostring(device))
-      device:set_param("Route", param)
-    end
+        channelVolumes = volumes,
+      },
+    }
+    Log.debug(param, "Unmuting Speaker route: " .. tostring(device))
+    device:set_param("Route", param)
     ::skip_route::
   end
 end
