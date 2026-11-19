@@ -2,7 +2,7 @@
 --
 -- Restore a node's volume and mute state, and log every change to them.
 --
--- For nodes that set asahi.restore-props = true, this script stores and
+-- For nodes that set aurora.restore-props = true, this script stores and
 -- restores the channel volumes and mute state in place of WirePlumber's
 -- stream state, which the node turns off with state.restore-props = false.
 --
@@ -27,13 +27,25 @@
 cutils = require ("common-utils")
 log = Log.open_topic ("s-node")
 
-ENABLE_PROP = "asahi.restore-props"
+ENABLE_PROP = "aurora.restore-props"
 FALLBACK_DEFAULT = 0.027   -- 30 % on a cubic volume slider
 BURST_MS = 500             -- changes closer than this are one log line
 RECENT_CLIENT_US = 3000000 -- clients that connected this long before a change
 
-state = State ("asahi-restore-volume")
-state_table = state:load ()
+-- The state file was named for the old project before the rename. Read it
+-- once when the new file is still empty, so stored volumes survive the
+-- upgrade. LEGACY-ASAHI(2027-02-28): drop the fallback after that date.
+function aurora_legacy_state_load (name, legacy_name)
+  local st = State (name)
+  local tbl = st:load ()
+  if next (tbl) == nil then
+    tbl = State (legacy_name):load ()
+  end
+  return st, tbl
+end
+
+state, state_table = aurora_legacy_state_load ("aurora-restore-volume",
+  "asahi-restore-volume")
 
 -- per node id: { volumes, mute } last seen, the pending log line, and
 -- whether this script's own restore is in flight
@@ -247,7 +259,7 @@ end)
 clients_om:activate ()
 
 SimpleEventHook {
-  name = "node/asahi-restore-volume",
+  name = "node/aurora-restore-volume",
   after = "node/restore-stream",
   interests = {
     EventInterest {
@@ -313,7 +325,7 @@ SimpleEventHook {
 }:register ()
 
 SimpleEventHook {
-  name = "node/asahi-store-volume",
+  name = "node/aurora-store-volume",
   interests = {
     EventInterest {
       Constraint { "event.type", "=", "node-params-changed" },
@@ -377,7 +389,7 @@ SimpleEventHook {
 }:register ()
 
 SimpleEventHook {
-  name = "node/asahi-forget-volume-log",
+  name = "node/aurora-forget-volume-log",
   interests = {
     EventInterest {
       Constraint { "event.type", "=", "node-removed" },

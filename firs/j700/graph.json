@@ -44,7 +44,7 @@
                 "name": "convL",
                 "config": {
                     "filename": [
-                        "/usr/share/asahi-audio/j700/48.wav"
+                        "/usr/share/aurora-audio/j700/48.wav"
                     ],
                     "channel": 0,
                     "gain": 1.41
@@ -56,7 +56,7 @@
                 "name": "convR",
                 "config": {
                     "filename": [
-                        "/usr/share/asahi-audio/j700/48.wav"
+                        "/usr/share/aurora-audio/j700/48.wav"
                     ],
                     "channel": 0,
                     "gain": 1.41
@@ -163,7 +163,7 @@
         "priority.session": 850,
         "state.default-volume": 0.027,
         "state.restore-props": false,
-        "asahi.restore-props": true,
+        "aurora.restore-props": true,
         "device.icon-name": "audio-speakers"
     },
     "playback.props": {

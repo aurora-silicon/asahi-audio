@@ -188,7 +188,7 @@ def signals(d):
 
 def offline_conf(board, d):
     g = load(os.path.join(FIRS, board, "graph.json"))
-    text = json.dumps(g).replace("/usr/share/asahi-audio/", FIRS + "/")
+    text = json.dumps(g).replace("/usr/share/aurora-audio/", FIRS + "/")
     g = json.loads(text)
     pp = g["playback.props"]
     args = {
