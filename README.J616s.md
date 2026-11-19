@@ -116,7 +116,7 @@ Published proxy evidence:
 [bring-up](https://github.com/aurora-silicon/m1n1/blob/fd360ef69054e42724b975d7a4c61e0242b6b341/docs/j616s-bringup.md)
 and
 [driver contracts](https://github.com/aurora-silicon/m1n1/blob/fd360ef69054e42724b975d7a4c61e0242b6b341/docs/j616s-driver-contracts.md),
-retained in [m1n1 draft PR 20](https://github.com/aurora-silicon/m1n1/pull/20).
+retained in [bootloader draft PR 20](https://github.com/aurora-silicon/m1n1/pull/20).
 The native display names and codec topology come from the local 2026-10-08
 macOS inventory and saved J616s ADT reviewed for this draft; the underlying
 native capture is not included here.

@@ -10,7 +10,7 @@
 -- 100 % and unmuted, until something is plugged in, and a volume or mute
 -- set on it in the meantime is not stored.
 --
--- For devices that set asahi.routes.select-unplugged = true, select the
+-- For devices that set aurora.routes.select-unplugged = true, select the
 -- best unplugged output route for such an output.  The route props are
 -- then applied as for any other route: the stored ones, or the device's
 -- device.routes.default-sink-volume.  The node starts at the volume the
@@ -30,14 +30,14 @@ devinfo = require ("device-info-cache")
 log = Log.open_topic ("s-device")
 
 SimpleEventHook {
-  name = "device/asahi-select-unplugged-routes",
+  name = "device/aurora-select-unplugged-routes",
   after = "device/find-best-routes",
   before = "device/apply-route-props",
   interests = {
     EventInterest {
       Constraint { "event.type", "=", "select-routes" },
       Constraint { "profile.active-device-ids", "is-present" },
-      Constraint { "asahi.routes.select-unplugged", "=", "true" },
+      Constraint { "aurora.routes.select-unplugged", "=", "true" },
     },
   },
   execute = function (event)
@@ -91,12 +91,12 @@ function routeKey (dev_name, route)
 end
 
 store_hook = SimpleEventHook {
-  name = "device/asahi-store-unplugged-route-props",
+  name = "device/aurora-store-unplugged-route-props",
   interests = {
     EventInterest {
       Constraint { "event.type", "=", "device-params-changed" },
       Constraint { "event.subject.param-id", "=", "Route" },
-      Constraint { "asahi.routes.select-unplugged", "=", "true" },
+      Constraint { "aurora.routes.select-unplugged", "=", "true" },
     },
   },
   execute = function (event)
@@ -149,13 +149,13 @@ store_hook = SimpleEventHook {
 }
 
 apply_hook = SimpleEventHook {
-  name = "device/asahi-apply-unplugged-route-props",
+  name = "device/aurora-apply-unplugged-route-props",
   after = "device/apply-route-props",
   before = "device/apply-routes",
   interests = {
     EventInterest {
       Constraint { "event.type", "=", "select-routes" },
-      Constraint { "asahi.routes.select-unplugged", "=", "true" },
+      Constraint { "aurora.routes.select-unplugged", "=", "true" },
     },
   },
   execute = function (event)
@@ -206,11 +206,23 @@ apply_hook = SimpleEventHook {
   end
 }
 
+-- The state file was named for the old project before the rename. Read it
+-- once when the new file is still empty, so stored volumes survive the
+-- upgrade. LEGACY-ASAHI(2027-02-28): drop the fallback after that date.
+function aurora_legacy_state_load (name, legacy_name)
+  local st = State (name)
+  local tbl = st:load ()
+  if next (tbl) == nil then
+    tbl = State (legacy_name):load ()
+  end
+  return st, tbl
+end
+
 -- follow WirePlumber's own switch for storing and restoring route props
 function toggleState (enable)
   if enable and not state then
-    state = State ("asahi-unplugged-routes")
-    state_table = state:load ()
+    state, state_table = aurora_legacy_state_load ("aurora-unplugged-routes",
+      "asahi-unplugged-routes")
     store_hook:register ()
     apply_hook:register ()
   elseif not enable and state then

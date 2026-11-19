@@ -1,7 +1,7 @@
 ## Linux userspace audio configuration for Apple Silicon Macs.
 
-This repo contains DSP configuration files for Apple Silicon Macs supported by the
-Asahi Linux project. Our goal is to make the Asahi Linux audio experience better than macOS,
+This repo contains DSP configuration files for Apple Silicon Macs supported by
+Aurora. Our goal is to make the Linux audio experience on these Macs better than macOS,
 and in doing so demonstrate that desktop Linux audio can be made fit for purpose with
 a little bit of effort.
 
@@ -25,12 +25,16 @@ a little bit of effort.
 
 ### Dependencies
 * speakersafetyd
-* linux-asahi 6.12.12-1 or above (7.1.6-1 for M3)
+* an Aurora kernel (aurora-silicon/linux, integration/aurora)
 * PipeWire 1.0 or above
 * WirePlumber 0.5.2 or above
 * Bankstown 1.1.0 or above
 * Triforce 0.2.0 or above
 * LSP Plugins 1.0.20 or above (only the LV2 set of plugins are used)
+
+### Origin
+
+This tree started as the Asahi Linux project's asahi-audio (see LICENSE).
 
 ### Why this is necessary
 Microspeakers are terrible. They are too small to reproduce any substantial bass at all,
