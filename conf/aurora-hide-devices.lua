@@ -9,7 +9,7 @@
 -- still shows its port: a second, dead "Microphone" beside the filter's
 -- source, or a "Speakers" port beside speakerguardd v2's voicing sink.
 --
--- For devices that set asahi.hide-device = true, take every permission on
+-- For devices that set aurora.hide-device = true, take every permission on
 -- the device away from every client but WirePlumber, as software-dsp does
 -- for the node. WirePlumber keeps managing the device (its profile, routes
 -- and nodes); clients see neither it nor its ports.
@@ -26,7 +26,7 @@ devices_om = ObjectManager {
 }
 
 local function hidden (device)
-  return cutils.parseBool (device.properties ["asahi.hide-device"])
+  return cutils.parseBool (device.properties ["aurora.hide-device"])
 end
 
 local function hide (client, id)

@@ -1,9 +1,9 @@
 # MacBook Neo J700 — speakers, headphones and microphones
 
-This addition needs the matching J700 UCM entries from alsa-ucm-conf-asahi.
+This addition needs the matching J700 UCM entries from alsa-ucm-conf-aurora.
 It is built from upstream f5b118a8a2fb150b145cb667b4738cdab0304eb0.
 
-The J700 is set up like the other Asahi laptops. Users see these devices:
+The J700 is set up like the other Aurora laptops. Users see these devices:
 
 | Device | Node | Available |
 |---|---|---|
@@ -62,10 +62,10 @@ The speaker sink comes back at the volume and mute state it last had,
 every time it is created (at every boot and whenever WirePlumber
 restarts).  The limits that protect the speakers are the kernel ceiling
 and the speaker-protection daemon above, not the sink volume.
-`asahi-restore-volume.lua` stores and restores the sink's channel volumes
+`aurora-restore-volume.lua` stores and restores the sink's channel volumes
 and mute state in place of WirePlumber's stream state, which the graph
 turns off for this sink with `state.restore-props = false` and hands over
-with `asahi.restore-props = true`.  The first time, the sink gets the
+with `aurora.restore-props = true`.  The first time, the sink gets the
 volume and mute WirePlumber had stored for it.  With nothing stored, or a
 stored volume that is not a number from 0 to 1 for each channel, it gets
 `state.default-volume`, 0.027: 30 % on desktop volume sliders (cubic
@@ -132,13 +132,13 @@ there is no ceiling.
 
 WirePlumber only selects routes that are available, so with nothing in
 the jack the headphone node would get no route and report 100 % until
-something is plugged in.  `asahi-unplugged-routes.lua`, enabled for the
-built-in card of every Mac with `asahi.routes.select-unplugged`, selects
+something is plugged in.  `aurora-unplugged-routes.lua`, enabled for the
+built-in card of every Mac with `aurora.routes.select-unplugged`, selects
 the unplugged headphone route anyway, so the node always shows the volume
 the headphones will get: the stored one, or the default above.
 WirePlumber does not store what is set on an unavailable route, so the
 script also keeps the volume and mute set while nothing is plugged in
-(`~/.local/state/wireplumber/asahi-unplugged-routes`) and applies them
+(`~/.local/state/wireplumber/aurora-unplugged-routes`) and applies them
 whenever the route is selected, until they are changed again with
 headphones in.
 
@@ -171,7 +171,7 @@ wake-word detection.
       arecord -D hw:AppleJ700AOP,0 -f S32_LE -r 16000 -c 2 -d 5 lpmic.wav
 
 * For a PipeWire source, link `firs/j700/lpmic-developer.conf` (installed as
-  `/usr/share/asahi-audio/j700/lpmic-developer.conf`) into
+  `/usr/share/aurora-audio/j700/lpmic-developer.conf`) into
   `~/.config/pipewire/pipewire.conf.d/` and restart `pipewire` and
   `wireplumber`; the file has the exact commands.  This adds "Aurora
   Low-Power Microphone (developer)" (`alsa_input.j700-lpmic-developer`) at
