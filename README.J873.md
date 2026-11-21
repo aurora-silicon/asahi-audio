@@ -1,12 +1,12 @@
 # Mac mini J873 (M6): speaker
 
-The kernel admits the J873 speaker under a fixed ceiling
-(aurora-silicon/linux#1862, on the `spk_fixed_ceiling` mechanism of #1884).
 The AOP's speaker stream has no receive side, so the amplifier's V/I sense
-never reaches Linux. Neither speakersafetyd nor speakerguardd can run, so
-there is no daemon to govern the speaker. `firs/j873/graph.json` is the
-userspace half of that arrangement: a high-pass and a limiter in front of
-the raw speaker device.
+never reaches Linux. The speaker therefore plays only behind speakerguardd
+v2's no-sense protect stage (aurora-silicon/speakerguardd#212 and #222), with
+the limits the machine itself provides. `firs/j873/graph.json` is a
+high-pass and a limiter in front of that protect stage. The WirePlumber rule
+matches only the protect stage's node, never the raw speaker PCM, so without
+speakerguardd there is no J873 speaker sink and the speaker stays muted.
 
 | Stage | Setting | Why |
 |---|---|---|
@@ -39,33 +39,7 @@ the amplifier muted, for full-scale stereo input at a sink volume of 100 %:
 
 The highest sample of the whole run is -1.00 dBFS.
 
-## No UCM yet
+## No raw speaker node
 
-alsa-ucm-conf-asahi has no "Mac mini J873" profile, so ACP does not create
-the raw speaker node the rule matches (`hw:AppleJ873,1`). Until it has one,
-turn the card's ACP device off and create the node as a PipeWire object,
-named as the other Macs' raw speaker node is:
-
-```
-context.objects = [
-    {   factory = adapter
-        flags = [ nofail ]
-        args = {
-            factory.name     = api.alsa.pcm.sink
-            node.name        = "alsa_output.platform-sound.RawSpeakers"
-            node.description = "Raw Speaker Device (do not use)"
-            media.class      = "Audio/Sink"
-            api.alsa.path    = "hw:AppleJ873,1"
-            audio.format     = "S24_32LE"
-            audio.rate       = 48000
-            audio.channels   = 1
-            audio.position   = [ MONO ]
-            priority.session = 100
-        }
-    }
-]
-```
-
-`nofail` lets PipeWire start on a kernel that keeps the speaker off (no
-speaker PCM). The rule in `conf/wireplumber.conf` then wraps the node in
-the graph and hides it.
+Do not expose `hw:AppleJ873,1` as a sink yourself (a hand-made PipeWire
+node, a pro-audio profile, `aplay`). That path has no protection.
