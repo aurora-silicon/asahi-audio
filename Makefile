@@ -79,9 +79,18 @@ install: aliases core j274 j293 j313 j314 j316 j413 j415 j375 j604 j614 j616 j70
 	for b in $(V2_SPEAKER_BOARDS); do rm -f $(DESTDIR)/$(DATA_DIR)/asahi-audio/$$b/graph.json; done
 	rm -f $(DESTDIR)/$(DATA_DIR)/asahi-audio/j700/48.wav
 
+# Opt-in for distributions that still ship speakersafetyd instead of
+# speakerguardd v2: put the V2_SPEAKER_BOARDS speaker graphs back, with their
+# WirePlumber rules in a separate fragment. Never combine with speakerguardd v2.
+install-legacy-speakers: install
+	for b in $(V2_SPEAKER_BOARDS); do install -pm0644 firs/$$b/graph.json $(DESTDIR)/$(DATA_DIR)/asahi-audio/$$b/graph.json; done
+	install -pm0644 firs/j700/48.wav $(DESTDIR)/$(DATA_DIR)/asahi-audio/j700/48.wav
+	install -pm0644 conf/legacy-speakers.conf $(DESTDIR)/$(DATA_DIR)/wireplumber/wireplumber.conf.d/99-asahi-legacy-speakers.conf
+
 uninstall:
 	rm -rf $(DESTDIR)/$(DATA_DIR)/asahi-audio/
 	rm -rf $(DESTDIR)/$(DATA_DIR)/wireplumber/wireplumber.conf.d/99-asahi.conf
+	rm -rf $(DESTDIR)/$(DATA_DIR)/wireplumber/wireplumber.conf.d/99-asahi-legacy-speakers.conf
 	rm -rf $(DESTDIR)/$(DATA_DIR)/wireplumber/scripts/device/asahi-limit-volume.lua
 	rm -rf $(DESTDIR)/$(DATA_DIR)/wireplumber/scripts/node/asahi-restore-volume.lua
 	rm -rf $(DESTDIR)/$(DATA_DIR)/pipewire/pipewire.conf.d/99-asahi.conf
