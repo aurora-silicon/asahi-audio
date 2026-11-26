@@ -43,10 +43,10 @@
                 "name": "convLT",
                 "config": {
                     "filename": [
-                        "/usr/share/asahi-audio/j413/tweeters-44.wav",
-                        "/usr/share/asahi-audio/j413/tweeters-48.wav",
-                        "/usr/share/asahi-audio/j413/tweeters-96.wav",
-                        "/usr/share/asahi-audio/j413/tweeters-192.wav"
+                        "/usr/share/aurora-audio/j413/tweeters-44.wav",
+                        "/usr/share/aurora-audio/j413/tweeters-48.wav",
+                        "/usr/share/aurora-audio/j413/tweeters-96.wav",
+                        "/usr/share/aurora-audio/j413/tweeters-192.wav"
                     ],
                     "channel": 0,
                     "gain": 1.6
@@ -58,10 +58,10 @@
                 "name": "convRT",
                 "config": {
                     "filename": [
-                        "/usr/share/asahi-audio/j413/tweeters-44.wav",
-                        "/usr/share/asahi-audio/j413/tweeters-48.wav",
-                        "/usr/share/asahi-audio/j413/tweeters-96.wav",
-                        "/usr/share/asahi-audio/j413/tweeters-192.wav"
+                        "/usr/share/aurora-audio/j413/tweeters-44.wav",
+                        "/usr/share/aurora-audio/j413/tweeters-48.wav",
+                        "/usr/share/aurora-audio/j413/tweeters-96.wav",
+                        "/usr/share/aurora-audio/j413/tweeters-192.wav"
                     ],
                     "channel": 0,
                     "gain": 1.6
@@ -73,10 +73,10 @@
                 "name": "convLW",
                 "config": {
                     "filename": [
-                        "/usr/share/asahi-audio/j413/woofers-44.wav",
-                        "/usr/share/asahi-audio/j413/woofers-48.wav",
-                        "/usr/share/asahi-audio/j413/woofers-96.wav",
-                        "/usr/share/asahi-audio/j413/woofers-192.wav"
+                        "/usr/share/aurora-audio/j413/woofers-44.wav",
+                        "/usr/share/aurora-audio/j413/woofers-48.wav",
+                        "/usr/share/aurora-audio/j413/woofers-96.wav",
+                        "/usr/share/aurora-audio/j413/woofers-192.wav"
                     ],
                     "channel": 0,
                     "gain": 1.2
@@ -88,10 +88,10 @@
                 "name": "convRW",
                 "config": {
                     "filename": [
-                        "/usr/share/asahi-audio/j413/woofers-44.wav",
-                        "/usr/share/asahi-audio/j413/woofers-48.wav",
-                        "/usr/share/asahi-audio/j413/woofers-96.wav",
-                        "/usr/share/asahi-audio/j413/woofers-192.wav"
+                        "/usr/share/aurora-audio/j413/woofers-44.wav",
+                        "/usr/share/aurora-audio/j413/woofers-48.wav",
+                        "/usr/share/aurora-audio/j413/woofers-96.wav",
+                        "/usr/share/aurora-audio/j413/woofers-192.wav"
                     ],
                     "channel": 0,
                     "gain": 1.2

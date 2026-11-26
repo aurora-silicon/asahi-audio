@@ -54,35 +54,35 @@ core:
 	install -dDm0755 $(DESTDIR)/$(DATA_DIR)/wireplumber/wireplumber.conf.d/
 	install -dDm0755 $(DESTDIR)/$(DATA_DIR)/pipewire/pipewire.conf.d/
 	install -dDm0755 $(DESTDIR)/$(DATA_DIR)/pipewire/pipewire-pulse.conf.d/
-	install -pm0644 conf/wireplumber.conf $(DESTDIR)/$(DATA_DIR)/wireplumber/wireplumber.conf.d/99-asahi.conf
-	install -pm0644 conf/asahi-lock-volume.lua $(DESTDIR)/$(DATA_DIR)/wireplumber/scripts/device/asahi-lock-volume.lua
-	install -pm0644 conf/asahi-unplugged-routes.lua $(DESTDIR)/$(DATA_DIR)/wireplumber/scripts/device/asahi-unplugged-routes.lua
-	install -pm0644 conf/asahi-hide-devices.lua $(DESTDIR)/$(DATA_DIR)/wireplumber/scripts/device/asahi-hide-devices.lua
-	install -pm0644 conf/asahi-keep-profile.lua $(DESTDIR)/$(DATA_DIR)/wireplumber/scripts/device/asahi-keep-profile.lua
-	install -pm0644 conf/asahi-restore-volume.lua $(DESTDIR)/$(DATA_DIR)/wireplumber/scripts/node/asahi-restore-volume.lua
-	install -pm0644 conf/pipewire.conf $(DESTDIR)/$(DATA_DIR)/pipewire/pipewire.conf.d/99-asahi.conf
-	install -pm0644 conf/pipewire.conf $(DESTDIR)/$(DATA_DIR)/pipewire/pipewire-pulse.conf.d/99-asahi.conf
-	install -dDm0755 $(DESTDIR)/$(DATA_DIR)/asahi-audio/
+	install -pm0644 conf/wireplumber.conf $(DESTDIR)/$(DATA_DIR)/wireplumber/wireplumber.conf.d/99-aurora.conf
+	install -pm0644 conf/aurora-lock-volume.lua $(DESTDIR)/$(DATA_DIR)/wireplumber/scripts/device/aurora-lock-volume.lua
+	install -pm0644 conf/aurora-unplugged-routes.lua $(DESTDIR)/$(DATA_DIR)/wireplumber/scripts/device/aurora-unplugged-routes.lua
+	install -pm0644 conf/aurora-hide-devices.lua $(DESTDIR)/$(DATA_DIR)/wireplumber/scripts/device/aurora-hide-devices.lua
+	install -pm0644 conf/aurora-keep-profile.lua $(DESTDIR)/$(DATA_DIR)/wireplumber/scripts/device/aurora-keep-profile.lua
+	install -pm0644 conf/aurora-restore-volume.lua $(DESTDIR)/$(DATA_DIR)/wireplumber/scripts/node/aurora-restore-volume.lua
+	install -pm0644 conf/pipewire.conf $(DESTDIR)/$(DATA_DIR)/pipewire/pipewire.conf.d/99-aurora.conf
+	install -pm0644 conf/pipewire.conf $(DESTDIR)/$(DATA_DIR)/pipewire/pipewire-pulse.conf.d/99-aurora.conf
+	install -dDm0755 $(DESTDIR)/$(DATA_DIR)/aurora-audio/
 
 j%: core
-	install -dDm0755 $(DESTDIR)/$(DATA_DIR)/asahi-audio/$@/
-	install -pm0644 -t $(DESTDIR)/$(DATA_DIR)/asahi-audio/$@/ $(wildcard firs/$@/*)
+	install -dDm0755 $(DESTDIR)/$(DATA_DIR)/aurora-audio/$@/
+	install -pm0644 -t $(DESTDIR)/$(DATA_DIR)/aurora-audio/$@/ $(wildcard firs/$@/*)
 
 
 # Boards whose speakers speakerguardd v2 drives from the Mac's own Apple tuning
-# (Plan A, voicing_pre): no asahi-audio speaker graph is installed for them.
+# (Plan A, voicing_pre): no aurora-audio speaker graph is installed for them.
 # Their FIRs stay where an alias graph of another board still uses them
 # (j316 for j416/j516/j616, j413 for j613); the microphone graphs stay.
 V2_SPEAKER_BOARDS = j316 j413 j616 j700
 
 install: aliases core j274 j293 j313 j314 j316 j413 j415 j375 j604 j614 j616 j700 j714
-	for b in $(V2_SPEAKER_BOARDS); do rm -f $(DESTDIR)/$(DATA_DIR)/asahi-audio/$$b/graph.json; done
-	rm -f $(DESTDIR)/$(DATA_DIR)/asahi-audio/j700/48.wav
+	for b in $(V2_SPEAKER_BOARDS); do rm -f $(DESTDIR)/$(DATA_DIR)/aurora-audio/$$b/graph.json; done
+	rm -f $(DESTDIR)/$(DATA_DIR)/aurora-audio/j700/48.wav
 
 uninstall:
-	rm -rf $(DESTDIR)/$(DATA_DIR)/asahi-audio/
-	rm -rf $(DESTDIR)/$(DATA_DIR)/wireplumber/wireplumber.conf.d/99-asahi.conf
-	rm -rf $(DESTDIR)/$(DATA_DIR)/wireplumber/scripts/device/asahi-limit-volume.lua
-	rm -rf $(DESTDIR)/$(DATA_DIR)/wireplumber/scripts/node/asahi-restore-volume.lua
-	rm -rf $(DESTDIR)/$(DATA_DIR)/pipewire/pipewire.conf.d/99-asahi.conf
-	rm -rf $(DESTDIR)/$(DATA_DIR)/pipewire/pipewire-pulse.conf.d/99-asahi.conf
+	rm -rf $(DESTDIR)/$(DATA_DIR)/aurora-audio/
+	rm -rf $(DESTDIR)/$(DATA_DIR)/wireplumber/wireplumber.conf.d/99-aurora.conf
+	rm -rf $(DESTDIR)/$(DATA_DIR)/wireplumber/scripts/device/aurora-limit-volume.lua
+	rm -rf $(DESTDIR)/$(DATA_DIR)/wireplumber/scripts/node/aurora-restore-volume.lua
+	rm -rf $(DESTDIR)/$(DATA_DIR)/pipewire/pipewire.conf.d/99-aurora.conf
+	rm -rf $(DESTDIR)/$(DATA_DIR)/pipewire/pipewire-pulse.conf.d/99-aurora.conf

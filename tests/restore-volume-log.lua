@@ -1,6 +1,6 @@
 -- SPDX-License-Identifier: MIT
 -- Exercise the real parameter-change hook with deterministic event ordering.
--- Run: lua tests/restore-volume-log.lua conf/asahi-restore-volume.lua
+-- Run: lua tests/restore-volume-log.lua conf/aurora-restore-volume.lua
 local hooks, lines = {}, {}
 package.preload['common-utils'] = function ()
   return { parseParam = function (p) return p end }
@@ -23,7 +23,7 @@ SimpleEventHook = function (o)
   return o
 end
 Core = { timeout_add = function () return { destroy = function () end } end }
-dofile (arg[1] or 'conf/asahi-restore-volume.lua')
+dofile (arg[1] or 'conf/aurora-restore-volume.lua')
 local node = { id = 1, properties = { ['node.name'] = 'audio_effect.j700-convolver' } }
 local props
 node.iterate_params = function ()
@@ -33,7 +33,7 @@ end
 local event = { get_subject = function () return node end }
 local function change (linear, mute)
   props = { channelVolumes = {linear, linear}, mute = mute or false }
-  hooks['node/asahi-store-volume'].execute (event)
+  hooks['node/aurora-store-volume'].execute (event)
 end
 local function reset (linear)
   last_seen[1] = { vols = {linear,linear}, mute = false }

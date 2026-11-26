@@ -43,10 +43,10 @@
                 "name": "convL",
                 "config": {
                     "filename": [
-                        "/usr/share/asahi-audio/j274/44.wav",
-                        "/usr/share/asahi-audio/j274/48.wav",
-                        "/usr/share/asahi-audio/j274/96.wav",
-                        "/usr/share/asahi-audio/j274/192.wav"
+                        "/usr/share/aurora-audio/j274/44.wav",
+                        "/usr/share/aurora-audio/j274/48.wav",
+                        "/usr/share/aurora-audio/j274/96.wav",
+                        "/usr/share/aurora-audio/j274/192.wav"
                     ],
                     "channel": 0
                 }
@@ -57,10 +57,10 @@
                 "name": "convR",
                 "config": {
                     "filename": [
-                        "/usr/share/asahi-audio/j274/44.wav",
-                        "/usr/share/asahi-audio/j274/48.wav",
-                        "/usr/share/asahi-audio/j274/96.wav",
-                        "/usr/share/asahi-audio/j274/192.wav"
+                        "/usr/share/aurora-audio/j274/44.wav",
+                        "/usr/share/aurora-audio/j274/48.wav",
+                        "/usr/share/aurora-audio/j274/96.wav",
+                        "/usr/share/aurora-audio/j274/192.wav"
                     ],
                     "channel": 0
                 }
