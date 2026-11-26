@@ -37,7 +37,7 @@ aliases-j413:
 	make -f $$PWD/Makefile -C firs/j413 graph-j613.json mic-j613.json graph-j713.json mic-j713.json
 
 aliases-j415:
-	make -f $$PWD/Makefile -C firs/j415 graph-j615.json mic-j615.json
+	make -f $$PWD/Makefile -C firs/j415 graph-j615.json mic-j615.json mic-j715.json
 
 graph-%.json: graph.json
 	sed -E "s/([^/][jJ])$$(basename "$$PWD" | tr -d j)/\1$(patsubst graph-j%.json,%,$@)/g" $< >$@
